@@ -44,7 +44,7 @@ class _SeatsScreenState extends State<SeatsScreen> {
             return SuccessPosts(posts: state.list);
           }
           return const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(strokeCap: StrokeCap.round,),
           );
         },
       ),

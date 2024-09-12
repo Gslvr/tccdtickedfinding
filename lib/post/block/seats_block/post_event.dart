@@ -10,7 +10,7 @@ sealed class SeatsEvent extends Equatable {
 
 
 final class SeatsListing extends SeatsEvent {
-  List<Map<String, dynamic>> saatler;
+  List<Map<String, dynamic>> saatler = [];
   String binissehir;
   String inisSehir;
 

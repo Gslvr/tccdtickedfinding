@@ -15,6 +15,7 @@ class _TextFieldFormState extends State<TextFieldForm> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 30),
       child: TextFormField(
+        style: const TextStyle(color: Colors.deepOrangeAccent),
         controller: widget.controller,
         onChanged: widget.onChange,
         decoration:  InputDecoration(
@@ -30,9 +31,12 @@ class _TextFieldFormState extends State<TextFieldForm> {
             borderRadius: BorderRadius.circular(25),
             borderSide: const BorderSide(color: Colors.red, width: 3)
           ),
+          errorStyle: const TextStyle(color: Colors.red),
           labelText: 'İstasyon Adı',
+          labelStyle: TextStyle(color: Colors.white),
           suffix: const Icon(Icons.train),
           hintText: 'En az 2 karakter giriniz',
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5),),
         ),
         keyboardType: TextInputType.text,
         validator: (value) {

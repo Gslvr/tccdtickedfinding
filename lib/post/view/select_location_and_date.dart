@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +46,7 @@ class _TCCDListesiState extends State<TCCDListesi> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       sehirler = await connect.getStationList(
           url: AppUrl().stationApi, body: AppUrl().seferBody);
+
       setState(() {});
     });
     cikisSehirc = TextEditingController();
@@ -53,22 +56,34 @@ class _TCCDListesiState extends State<TCCDListesi> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('TCDD Bilet Arama'),
-      ),
-      bottomNavigationBar: Container(
-        height: 50,
-        padding: const EdgeInsets.only(right: 30),
-        child: const Text(
-          "Designed by "
-          "GLSVR",
-          textAlign: TextAlign.right,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey),
+    return Container(
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('Assets/img/trainstation.jpg'),
+              fit: BoxFit.cover,
+              opacity: 0.6)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            'TCDD Bilet Arama',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.transparent,
         ),
-      ),
-      body: Center(
-        child: SizedBox(
+        bottomNavigationBar: Container(
+          height: 50,
+          padding: const EdgeInsets.only(right: 30),
+          child: const Text(
+            "Designed by \n"
+            "GLSVR",
+            textAlign: TextAlign.right,
+            style: TextStyle(
+                fontWeight: FontWeight.w400, color: Colors.white, fontSize:
+            12,letterSpacing: 3,leadingDistribution: TextLeadingDistribution.even),
+          ),
+        ),
+        body: Center(
           child: Form(
             key: formKey,
             child: Column(
@@ -108,7 +123,13 @@ class _TCCDListesiState extends State<TCCDListesi> {
                           secilisehirler.clear();
                         },
                         child: ListTile(
-                          title: Text(e['istasyonAdi']),
+                          title: Text(
+                            e['istasyonAdi'],
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -148,7 +169,13 @@ class _TCCDListesiState extends State<TCCDListesi> {
                           secilisehirlervaris.clear();
                         },
                         child: ListTile(
-                          title: Text(e['istasyonAdi']),
+                          title: Text(
+                            e['istasyonAdi'],
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -158,16 +185,26 @@ class _TCCDListesiState extends State<TCCDListesi> {
                     ? SizedBox(
                         height: 200,
                         width: 300,
-                        child: CupertinoDatePicker(
-                          mode: CupertinoDatePickerMode.date,
-                          minimumDate: DateTime.now(),
-                          maximumDate: DateTime.now().add(Duration(days: 30)),
-                          initialDateTime: DateTime.now(),
-                          onDateTimeChanged: (DateTime newDateTime) async {
-                            setState(() {
-                              harekettarih = newDateTime;
-                            });
-                          },
+                        child: CupertinoTheme(
+                          data: const CupertinoThemeData(
+                            textTheme: CupertinoTextThemeData(
+                              dateTimePickerTextStyle:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            backgroundColor: Colors.black.withOpacity(0.4),
+                            minimumDate: DateTime.now(),
+                            maximumDate:
+                                DateTime.now().add(const Duration(days: 29)),
+                            initialDateTime: DateTime.now(),
+                            onDateTimeChanged: (DateTime newDateTime) async {
+                              setState(() {
+                                harekettarih = newDateTime;
+                              });
+                            },
+                          ),
                         ),
                       )
                     : const SizedBox(),
@@ -191,7 +228,7 @@ class _TCCDListesiState extends State<TCCDListesi> {
                                 "inisIstasyonu_isHaritaGosterimi": false,
                                 "seyahatTuru": 1,
                                 "gidisTarih":
-                                    DateFormat('MMM d, yyyy hh:mm:ss a','en')
+                                    DateFormat('MMM d, yyyy hh:mm:ss a', 'en')
                                         .format(harekettarih),
                                 "bolgeselGelsin": false,
                                 "islemTipi": 0,
@@ -298,116 +335,5 @@ class _TCCDListesiState extends State<TCCDListesi> {
         );
       },
     );
-  }
-
-  void _sonucdialog(BuildContext context, List<KoltukListesi>? sonuclar,
-      DateTime harekettarih) {
-    if (sonuclar != null && sonuclar.isNotEmpty) {
-      KoltukListesi? koltuknesnesi;
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Müsait Koltuklar'),
-            content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return SizedBox(
-                  height: 300,
-                  width: 300,
-                  child: ListView.builder(itemBuilder: (context, index) {
-                    koltuknesnesi = sonuclar[index];
-
-                    // Grouping by vagonSiraNo
-                    Map<int, List<KoltukDurum>> groupedByVagon = {};
-                    for (var koltuk in koltuknesnesi!.koltuklistesi) {
-                      if (!groupedByVagon.containsKey(koltuk.vagonSiraNo)) {
-                        groupedByVagon[koltuk.vagonSiraNo] = [];
-                      }
-                      groupedByVagon[koltuk.vagonSiraNo]!.add(koltuk);
-                    }
-                    // Sorting the groups by vagonSiraNo
-                    var sortedKeys = groupedByVagon.keys.toList()..sort();
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: sortedKeys.map((vagonSiraNo) {
-                        var koltuklar = groupedByVagon[vagonSiraNo]!;
-                        // Sort koltuklar such that those with 'h' in koltukNo come first, then by koltukNo
-                        koltuklar.sort((a, b) {
-                          if (a.koltukNo.toString().contains('h') &&
-                              !b.koltukNo.toString().contains('h')) {
-                            return -1;
-                          } else if (!a.koltukNo.toString().contains('h') &&
-                              b.koltukNo.toString().contains('h')) {
-                            return 1;
-                          } else {
-                            // Compare as numbers, treating single-digit numbers as smaller
-                            int aNum = int.tryParse(a.koltukNo.toString()) ?? 0;
-                            int bNum = int.tryParse(b.koltukNo.toString()) ?? 0;
-                            return aNum.compareTo(bNum);
-                          }
-                        });
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Vagon No: $vagonSiraNo',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.blueGrey)),
-                            Text('Seçilen Saat: ${koltuknesnesi!.saat}',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.blueGrey)),
-                            const Divider(height: 5),
-                            ...koltuklar.map((koltuk) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text('Koltuk No: ${koltuk.koltukNo}',
-                                      textAlign: TextAlign.center),
-                                  koltuk.koltukNo.toString().contains('h')
-                                      ? const Icon(Icons.accessible,
-                                          color: Colors.blue)
-                                      : const Icon(Icons.person,
-                                          color: Colors.blueGrey),
-                                ],
-                              );
-                            }).toList(),
-                            const Divider(height: 5),
-                          ],
-                        );
-                      }).toList(),
-                    );
-                  }),
-                );
-              },
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Müsait Koltuklar'),
-            content: const Text('Müsait koltuk bulunamadı'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 }

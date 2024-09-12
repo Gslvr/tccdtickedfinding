@@ -49,9 +49,8 @@ class SeatsBloc extends Bloc<SeatsEvent, SeatsState> {
 
     // Display the grouped and sorted list
     groupedByVagon.forEach((vagonSiraNo, koltuklar) {
-      print('Vagon No: $vagonSiraNo');
       for (var koltuk in koltuklar) {
-        print('Koltuk No: ${koltuk.koltukNo}');
+
       }
     });
   }
